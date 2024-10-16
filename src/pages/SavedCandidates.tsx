@@ -1,20 +1,26 @@
 import { useEffect, useState } from 'react';
 import Candidate from '../interfaces/Candidate.interface';
 
-const SavedCandidates = () => {
+function SavedCandidates() {
   const [savedCandidates, setSavedCandidates] = useState<Candidate[]>([]);
 
-  // Load saved candidates from localStorage when the component mounts
   useEffect(() => {
-    const storedCandidates = JSON.parse(localStorage.getItem('savedCandidates') || '[]');
-    setSavedCandidates(storedCandidates);
+    try {
+      const storedCandidates = JSON.parse(localStorage.getItem('savedCandidates') || '[]');
+      setSavedCandidates(storedCandidates);
+    } catch (error) {
+      console.error("Error loading saved candidates:", error);
+      setSavedCandidates([]); // Reset to empty array on error
+    }
   }, []);
 
   // Remove a candidate from the saved list
   const handleRemoveCandidate = (username: string) => {
-    const updatedCandidates = savedCandidates.filter((candidate) => candidate.login !== username);
-    setSavedCandidates(updatedCandidates);
-    localStorage.setItem('savedCandidates', JSON.stringify(updatedCandidates));
+    setSavedCandidates(prevCandidates => {
+      const updatedCandidates = prevCandidates.filter(candidate => candidate.login !== username);
+      localStorage.setItem('savedCandidates', JSON.stringify(updatedCandidates));
+      return updatedCandidates;
+    });
   };
 
   return (
@@ -22,13 +28,12 @@ const SavedCandidates = () => {
       <h1>Potential Candidates</h1>
 
       {savedCandidates.length > 0 ? (
-        savedCandidates.map((candidate) => (
+        savedCandidates.map(candidate => (
           <div key={candidate.login} style={{ border: '1px solid #ccc', padding: '10px', marginBottom: '10px' }}>
-            <img 
-              src={candidate.avatar_url || 'path/to/fallback-image.png'} 
-              alt={candidate.name || candidate.login} 
-              width="100" 
-            />
+            <img
+              src={candidate.avatar_url || 'path/to/fallback-image.png'}
+              alt={candidate.name || candidate.login}
+              width="100" />
 
             <div>
               <h2>{candidate.name || 'No Name Available'}</h2>
@@ -51,6 +56,6 @@ const SavedCandidates = () => {
       )}
     </div>
   );
-};
+}
 
 export default SavedCandidates;
