@@ -10,11 +10,10 @@ function SavedCandidates() {
       setSavedCandidates(storedCandidates);
     } catch (error) {
       console.error("Error loading saved candidates:", error);
-      setSavedCandidates([]); // Reset to empty array on error
+      setSavedCandidates([]);
     }
   }, []);
 
-  // Remove a candidate from the saved list
   const handleRemoveCandidate = (username: string) => {
     setSavedCandidates(prevCandidates => {
       const updatedCandidates = prevCandidates.filter(candidate => candidate.login !== username);
@@ -34,14 +33,6 @@ function SavedCandidates() {
               src={candidate.avatar_url || 'path/to/fallback-image.png'}
               alt={candidate.name || candidate.login}
               width="100" />
-
-            <div>
-              <h2>{candidate.name || 'No Name Available'}</h2>
-              <p>Username: {candidate.login}</p>
-              <p>Location: {candidate.location || 'No Location Available'}</p>
-              <p>Email: {candidate.email || 'No Email Available'}</p>
-              <p>Company: {candidate.company || 'No Company Available'}</p>
-            </div>
             <div>
               <a href={candidate.html_url} target="_blank" rel="noopener noreferrer">
                 GitHub Profile

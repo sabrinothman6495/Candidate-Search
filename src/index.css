@@ -118,10 +118,3 @@ tbody tr:nth-child(odd) {
   width: 80vw;
   table-layout: fixed;
 }
-avitar_url {
-  border-radius: 50%;
-  width: 50px;
-  height: 50px;
-  background-image: url(${avitar_url});
-
-}

@@ -8,12 +8,14 @@ const CandidateSearch = () => {
   const [potentialCandidates, setPotentialCandidates] = useState<Candidate[]>(
     JSON.parse(localStorage.getItem('potentialCandidates') || '[]')
   );
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     let isMounted = true; 
 
     const fetchCandidate = async () => {
       setLoading(true);
+      setError(null); // Reset error state before fetching
       try {
         const response = await searchGithub();
         if (isMounted) {
@@ -21,6 +23,9 @@ const CandidateSearch = () => {
         }
       } catch (error) {
         console.error("Error fetching candidate:", error);
+        if (isMounted) {
+          setError("Failed to fetch candidate. Please try again.");
+        }
       } finally {
         if (isMounted) {
           setLoading(false);
@@ -42,6 +47,7 @@ const CandidateSearch = () => {
         localStorage.setItem('potentialCandidates', JSON.stringify(updatedCandidates));
         return updatedCandidates;
       });
+      setCandidate(null); // Clear candidate after accepting
     }
     fetchNewCandidate();
   };
@@ -52,11 +58,13 @@ const CandidateSearch = () => {
 
   const fetchNewCandidate = async () => {
     setLoading(true);
+    setError(null); // Reset error state before fetching
     try {
       const response = await searchGithub();
       setCandidate(response);
     } catch (error) {
       console.error("Error fetching new candidate:", error);
+      setError("Failed to fetch new candidate. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -69,6 +77,10 @@ const CandidateSearch = () => {
         <p>Loading...</p>
       ) : (
         <div>
+          {error && <p style={{ color: 'red' }}>{error}</p>} {/* Display error message */}
+          <button type="button" onClick={fetchNewCandidate}>
+            Search New Candidate
+          </button>
           <h2>{candidate?.name}</h2>
           <p>Username: {candidate?.login}</p>
           <p>Location: {candidate?.location}</p>
@@ -90,16 +102,14 @@ const CandidateSearch = () => {
               width="100"
             />
             <div>
-              <h2>{candidate.name || 'No Name Available'}</h2>
-              <p>Username: {candidate.login}</p>
-              <p>Location: {candidate.location || 'No Location Available'}</p>
-              <p>Email: {candidate.email || 'No Email Available'}</p>
-              <p>Company: {candidate.company || 'No Company Available'}</p>
-            </div>
-            <div>
+              <p>{candidate.name}</p>
+              <p>{candidate.login}</p>
+              <p>{candidate.location}</p>
               <a href={candidate.html_url} target="_blank" rel="noopener noreferrer">
                 GitHub Profile
               </a>
+              <img src="" alt="" />
+
             </div>
           </div>
         ))
